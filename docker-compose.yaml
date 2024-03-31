@@ -1,0 +1,29 @@
+version: '3.7'
+services:
+  redis:
+    image: redis:alpine
+    hostname: redis
+    command:
+      - redis-server
+    restart: on-failure
+    environment:
+      - REDIS_HOST=redis
+    networks:
+      - bot
+    ports:
+      - "6379:6379"
+
+  bot:
+    container_name: weather_bot
+    build: .
+    command: sh -c "python -m main"
+    depends_on:
+      - redis
+    networks:
+      - bot
+    restart: always
+
+networks:
+  bot:
+    name: bot
+    driver: bridge
