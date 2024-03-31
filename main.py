@@ -13,9 +13,9 @@ async def main():
         format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
     )
 
-    # storage = RedisStorage.from_url("redis://redis:6379/3")
+    storage = RedisStorage.from_url("redis://redis:6379/3")
 
-    dp = Dispatcher()
+    dp = Dispatcher(storage=storage)
     bot = Bot(config.bot_token.get_secret_value())
 
     dp.include_router(common.router)
