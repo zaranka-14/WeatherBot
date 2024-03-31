@@ -9,4 +9,5 @@ df_dict = df.to_dict()
 
 
 def get_info(x: int, y: int, day: int) -> dict:
+    print(df_dict)
     return df_dict[x + y * 30 + day * 900]

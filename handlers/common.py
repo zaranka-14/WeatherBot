@@ -1,3 +1,5 @@
+import logging
+
 from aiogram import F, Router
 from aiogram.filters import Command
 from aiogram.filters import StateFilter
@@ -28,24 +30,12 @@ async def cmd_start(message: Message, state: FSMContext):
 
 
 async def correct_input(line: str) -> (bool, int, int):
-    if len(line) != 5:
+    if ":" not in line:
         return False, 0, 0
-    if line[0].isnumeric() and line[1].isnumeric():
-        x = line[0:2]
-    else:
+    x, y = line.split(":")
+    if int(x) > 30 or int(y) > 30:
         return False, 0, 0
-    line.removeprefix(x)
-    if line[0] != ':':
-        return False, 0, 0
-    else:
-        line.removeprefix(':')
-    if line[0].isnumeric() and line[1].isnumeric():
-        y = line[0:2]
-    else:
-        return False, 0, 0
-    if int(x) >= 30 or int(y) >= 30:
-        return False, int(x), int(y)
-    return True, int(x), int(y)
+    return True, x, y
 
 
 @router.message(StateFilter(ChoosePlaceAndDay.coordinates))
@@ -69,11 +59,11 @@ async def choose_coordinate(message: Message, state: FSMContext):
 
 @router.callback_query(StateFilter(ChoosePlaceAndDay.day), F.data.in_(available_day_callback))
 async def choose_day(callback: CallbackQuery, state: FSMContext):
-    day = int(callback.data)
+    day = callback.data
     x_y_dict = await state.get_data()
     x = x_y_dict["x_value"]
     y = x_y_dict["y_value"]
-    info = get_info(x, y, day)
+    info = get_info(int(x), int(y), int(day.split("_")[1]))
 
     await callback.message.edit_text(
         text=f"Всё, что известно об этом месте на {day} день:\n"
